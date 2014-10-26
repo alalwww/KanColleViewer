@@ -42,10 +42,108 @@ namespace Grabacr07.KanColleViewer.Views.Controls
 			var value = (LimitedValue)e.NewValue;
 
 			source.ChangeColor(value);
+			UpdateToolTip(source, value, source.ToolTipEnabled, source.ToolTipFormatter, source.ToolTipLabel);
 		}
 
 		#endregion
 
+		#region ToolTip関連
+
+		/// <summary>
+		/// デフォルトのツールチップフォーマッター。
+		/// </summary>
+		public static readonly Func<LimitedValue, string, string> defaultToolTipFormatter = (v, l) => (String.IsNullOrEmpty(l) ? "" : l + ":") + v.Current + "/" + v.Maximum;
+
+		#region ToolTipEnabled 依存関係プロパティ
+
+		/// <summary>
+		/// ツールチップ有効/無効依存関係プロパティの値を設定または参照します。
+		/// </summary>
+		public bool ToolTipEnabled
+		{
+			get { return (bool)GetValue(ToolTipEnabledProperty); }
+			set { SetValue(ToolTipEnabledProperty, value); }
+		}
+
+		/// <summary>
+		/// ツールチップ有効/無効の依存関係プロパティ。
+		/// </summary>
+		public static readonly DependencyProperty ToolTipEnabledProperty =
+			 DependencyProperty.Register("ToolTipEnabled",
+			typeof(bool), typeof(ColorIndicator),
+			new UIPropertyMetadata(true, ToolTipEnabledPropertyChangedCallback));
+
+		private static void ToolTipEnabledPropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
+		{
+			var source = (ColorIndicator)d;
+			var enabled = (bool)e.NewValue;
+			UpdateToolTip(source, source.LimitedValue, enabled, source.ToolTipFormatter, source.ToolTipLabel);
+		}
+
+		#endregion
+
+		#region ToolTipLabel 依存関係プロパティ
+
+		/// <summary>
+		/// ツールチップラベル依存関係プロパティの値を設定または参照します。
+		/// </summary>
+		public string ToolTipLabel
+		{
+			get { return (string)GetValue(ToolTipLabelProperty); }
+			set { SetValue(ToolTipLabelProperty, value); }
+		}
+
+		/// <summary>
+		/// ツールチップラベルの依存関係プロパティ。
+		/// </summary>
+		public static readonly DependencyProperty ToolTipLabelProperty =
+			 DependencyProperty.Register("ToolTipLabel",
+			typeof(string), typeof(ColorIndicator),
+			new UIPropertyMetadata(null, ToolTipLabelPropertyChangedCallback));
+
+		private static void ToolTipLabelPropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
+		{
+			var source = (ColorIndicator)d;
+			var label = (string)e.NewValue;
+			UpdateToolTip(source, source.LimitedValue, source.ToolTipEnabled, source.ToolTipFormatter, label);
+		}
+
+		#endregion
+
+		#region ToolTipFormatter 依存関係プロパティ
+
+		/// <summary>
+		/// ツールチップのフォーマッター依存関係プロパティの値を設定または参照します。
+		/// 
+		/// このプロパティの持つメソッドのシグネチャは、第一引数にインジケーターの値、
+		/// 第二引数にツールチップのラベルとして用いる文字列を受け取り
+		/// ツールチップに表示する文字列を返します。
+		/// 
+		/// </summary>
+		public Func<LimitedValue, string, string> ToolTipFormatter
+		{
+			get { return (Func<LimitedValue, string, string>)GetValue(ToolTipFormatterProperty); }
+			set { SetValue(ToolTipFormatterProperty, value); }
+		}
+
+		/// <summary>
+		/// ツールチップのフォーマッター依存関係プロパティの値を設定または参照します。
+		/// </summary>
+		public static readonly DependencyProperty ToolTipFormatterProperty =
+			DependencyProperty.Register("ToolTipFormatter",
+			typeof(Func<LimitedValue, string, string>), typeof(ColorIndicator),
+			new UIPropertyMetadata(defaultToolTipFormatter, ToolTipFormatterPropertyChangedCallback));
+
+		private static void ToolTipFormatterPropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
+		{
+			var source = (ColorIndicator)d;
+			var formatter = (Func<LimitedValue, string, string>)e.NewValue;
+			UpdateToolTip(source, source.LimitedValue, source.ToolTipEnabled, formatter, source.ToolTipLabel);
+		}
+
+		#endregion
+
+		#endregion
 
 		private void ChangeColor(LimitedValue value)
 		{
@@ -69,6 +167,12 @@ namespace Grabacr07.KanColleViewer.Views.Controls
 			else color = Color.FromRgb(64, 200, 32);
 
 			this.Foreground = new SolidColorBrush(color);
+		}
+
+		private static void UpdateToolTip(ColorIndicator source, LimitedValue value,
+				bool enabled, Func<LimitedValue, string, string> formatter, string label)
+		{
+			ToolTipService.SetToolTip(source, enabled ? formatter(value, label) : null);
 		}
 	}
 }
