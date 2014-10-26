@@ -122,6 +122,14 @@
 												   Foreground="{DynamicResource ActiveForegroundBrushKey}" />
 									</StackPanel>
 								</Border>
+								<DataTemplate.Triggers>
+									<DataTrigger Binding="{Binding IsSelected}"
+												 Value="True">
+										<Setter TargetName="FleetName"
+												Property="TextDecorations"
+												Value="UnderLine" />
+									</DataTrigger>
+								</DataTemplate.Triggers>
 							</DataTemplate>
 						</ItemsControl.ItemTemplate>
 					</ListBox>
