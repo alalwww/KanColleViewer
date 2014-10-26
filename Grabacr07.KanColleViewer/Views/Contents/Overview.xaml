@@ -103,7 +103,8 @@
 
 			<Border VerticalAlignment="Top">
 				<DockPanel DataContext="{Binding Content.Fleets}">
-					<ListBox DockPanel.Dock="Top"
+					<DockPanel DockPanel.Dock="Top">
+					<ListBox DockPanel.Dock="Left"
 							 ItemsSource="{Binding Fleets}"
 							 SelectedValue="{Binding SelectedFleet, Mode=TwoWay}"
 							 Style="{DynamicResource HorizontalFlatListBoxStyleKey}">
@@ -121,17 +122,12 @@
 												   Foreground="{DynamicResource ActiveForegroundBrushKey}" />
 									</StackPanel>
 								</Border>
-								<DataTemplate.Triggers>
-									<DataTrigger Binding="{Binding IsSelected}"
-												 Value="True">
-										<Setter TargetName="FleetName"
-												Property="Text"
-												Value="{Binding Name}" />
-									</DataTrigger>
-								</DataTemplate.Triggers>
 							</DataTemplate>
 						</ItemsControl.ItemTemplate>
 					</ListBox>
+					<TextBlock Text="艦隊名:"/>
+					<TextBlock Text="{Binding SelectedFleet.Name}"/>
+					</DockPanel>
 
 					<vContents:StateDetailIndicator DockPanel.Dock="Top"
 													DataContext="{Binding SelectedFleet}"
